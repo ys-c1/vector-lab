@@ -8,5 +8,6 @@
 | stroke | demo.txt | 折线描边到多边形轮廓 |
 | dash | demo.txt | 虚线切分与相位控制 |
 | bbox | demo.txt | 点集包围盒与旋转盒 |
+| clip | demo.txt | 凸多边形裁剪与两段式按边偏移收缩环 |
 
 每个模块：`make -C <模块> test`，演示：`make -C <模块> demo`。
