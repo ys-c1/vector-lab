@@ -8,5 +8,6 @@
 | stroke | demo.txt | 折线描边到多边形轮廓 |
 | dash | demo.txt | 虚线切分与相位控制 |
 | bbox | demo.txt | 点集包围盒与旋转盒 |
+| pick | demo.txt, hits.csv | 射线拾取：包围盒剔除 + 最近命中，1k/10k 段基准 |
 
 每个模块：`make -C <模块> test`，演示：`make -C <模块> demo`。
