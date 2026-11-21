@@ -1,4 +1,6 @@
 #include "clip.h"
+#include <stdio.h>
+#include <string.h>
 
 static int inside(CPoint a, CPoint b, CPoint p) {
     double cr = (b.x - a.x) * (p.y - a.y) - (b.y - a.y) * (p.x - a.x);
@@ -51,4 +53,94 @@ double clip_area(const CPoly *p) {
         s += a.x * b.y - b.x * a.y;
     }
     return s * 0.5;
+}
+
+int clip_concave(const CPoint *poly, int n, const CPoint *win, int wn,
+                 int split, CPoly *outs, int cap, int *nouts,
+                 double *union_area, int *npieces, int *err_piece) {
+    if (err_piece) *err_piece = -1;
+    if (nouts) *nouts = 0;
+    if (union_area) *union_area = 0.0;
+    if (npieces) *npieces = 0;
+    if (!poly || !win || !outs || n < 3 || wn < 3 || cap < 1)
+        return CLIP_E_ARG;
+
+    /* 拆分关闭：与现状完全一致（逐顶点拷贝自 clip_convex） */
+    if (!split) {
+        int rc = clip_convex(poly, n, win, wn, &outs[0]);
+        if (rc != 0) return CLIP_E_ARG;
+        *nouts = outs[0].count > 0 ? 1 : 0;
+        *union_area = clip_area(&outs[0]);
+        return 0;
+    }
+
+    CPoly pieces[CLIP_MAX_PIECES];
+    int npc = clip_decompose(win, wn, pieces, CLIP_MAX_PIECES, err_piece);
+    if (npc < 0) return npc;
+    if (npc == 0) { if (err_piece) *err_piece = -1; return CLIP_E_NO_PIECES; }
+    if (npieces) *npieces = npc;
+
+    int used = 0;
+    double area = 0.0;
+    for (int k = 0; k < npc; ++k) {
+        if (pieces[k].count < 3) {
+            if (err_piece) *err_piece = k;
+            return CLIP_E_PIECE_VERTS;
+        }
+        CPoly one;
+        int rc = clip_convex(poly, n, pieces[k].pts, pieces[k].count, &one);
+        if (rc != 0) return CLIP_E_ARG;
+        if (one.count < 3) continue; /* 该块完全落在被裁多边形外 */
+        if (used >= cap) return CLIP_E_CAP;
+        outs[used++] = one;
+        double a = clip_area(&one);
+        if (a < 0.0) a = -a;
+        area += a;
+    }
+    *nouts = used;
+    *union_area = area;
+    return 0;
+}
+
+long clip_pieces_csv(const CPoly *pieces, int npieces, FILE *fp) {
+    if (!pieces || !fp || npieces < 0) return -1;
+    long bytes = 0;
+    int w = fprintf(fp, "piece,vertex,x,y,piece_area\n");
+    if (w < 0) return -1;
+    bytes += w;
+    for (int k = 0; k < npieces; ++k) {
+        double a = clip_area(&pieces[k]);
+        if (a < 0.0) a = -a;
+        for (int i = 0; i < pieces[k].count; ++i) {
+            w = fprintf(fp, "%d,%d,%.10g,%.10g,%.10g\n",
+                        k, i, pieces[k].pts[i].x, pieces[k].pts[i].y, a);
+            if (w < 0) return -1;
+            bytes += w;
+        }
+    }
+    return bytes;
+}
+
+const char *clip_strerror(int code, int err_piece, char *buf, int buflen) {
+    if (!buf || buflen <= 0) return "clip error";
+    switch (code) {
+    case CLIP_E_ARG:
+        snprintf(buf, buflen, "invalid arguments or polygon with fewer than 3 vertices");
+        break;
+    case CLIP_E_PIECE_VERTS:
+        snprintf(buf, buflen, "convex piece #%d has fewer than 3 vertices or is degenerate",
+                 err_piece);
+        break;
+    case CLIP_E_NO_PIECES:
+        snprintf(buf, buflen, "convex decomposition produced 0 pieces (piece #%d)",
+                 err_piece < 0 ? 0 : err_piece);
+        break;
+    case CLIP_E_CAP:
+        snprintf(buf, buflen, "output capacity exceeded (piece #%d)", err_piece);
+        break;
+    default:
+        snprintf(buf, buflen, "unknown clip error %d", code);
+        break;
+    }
+    return buf;
 }

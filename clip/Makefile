@@ -9,9 +9,16 @@ all: test
 test: build/test
 	./build/test
 
-build/test: $(SRC) test.c $(HDR)
+build/test: $(SRC) test.c shapes.h $(HDR)
 	@mkdir -p build
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) test.c -lm -o $@
+
+bench: build/bench
+	./build/bench build
+
+build/bench: $(SRC) bench.c shapes.h $(HDR)
+	@mkdir -p build
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) bench.c -lm -o $@
 
 demo: build/demo
 	./build/demo
@@ -23,4 +30,4 @@ build/demo: $(SRC) demo.c $(HDR)
 clean:
 	rm -rf build demo.txt
 
-.PHONY: all test demo clean
+.PHONY: all test bench demo clean
