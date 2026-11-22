@@ -5,6 +5,7 @@
 | 模块 | 产物 | 内容 |
 |---|---|---|
 | bezier | demo.txt | 三次贝塞尔求值与按容差细分 |
+| fit | demo.txt | 必经点反解贝塞尔控制点（最小二乘，超差自动分段） |
 | stroke | demo.txt | 折线描边到多边形轮廓 |
 | dash | demo.txt | 虚线切分与相位控制 |
 | bbox | demo.txt | 点集包围盒与旋转盒 |
