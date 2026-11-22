@@ -20,7 +20,19 @@ build/demo: $(SRC) demo.c $(HDR)
 	@mkdir -p build
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) demo.c -lm -o $@
 
+compat: build/test_compat build/demo_compat
+	./build/test_compat
+	./build/demo_compat
+
+build/test_compat: $(SRC) test.c $(HDR)
+	@mkdir -p build
+	$(CC) $(CPPFLAGS) $(CFLAGS) -DSVG_REL=0 $(SRC) test.c -lm -o $@
+
+build/demo_compat: $(SRC) demo.c $(HDR)
+	@mkdir -p build
+	$(CC) $(CPPFLAGS) $(CFLAGS) -DSVG_REL=0 $(SRC) demo.c -lm -o $@
+
 clean:
 	rm -rf build demo.txt demo.pgm
 
-.PHONY: all test demo clean
+.PHONY: all test demo compat clean

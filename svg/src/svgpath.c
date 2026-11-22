@@ -17,6 +17,73 @@ static const char *read_num(const char *p, double *v) {
     return end;
 }
 
+#if SVG_REL
+
+int svg_parse_ex(const char *d, VPath *out, int *err_seg) {
+    int seg = 0;
+#define FAIL(code) do { if (err_seg) *err_seg = seg; return (code); } while (0)
+    if (!d || !out) return -1;
+    out->count = 0;
+    const char *p = skip_sep(d);
+    if (!p || (*p != 'M' && *p != 'm')) { if (err_seg) *err_seg = 1; return -2; }
+    VPoint cur = {0, 0}, start = {0, 0};
+    while (*p) {
+        p = skip_sep(p);
+        if (!*p) break;
+        char cmd = *p;
+        ++seg;
+        if (cmd != 'M' && cmd != 'm' && cmd != 'L' && cmd != 'l'
+            && cmd != 'H' && cmd != 'h' && cmd != 'V' && cmd != 'v'
+            && cmd != 'Z' && cmd != 'z') FAIL(-3);
+        ++p;
+        if (cmd == 'Z' || cmd == 'z') {
+            if (out->count < 255) {
+                VSeg s = {SV_LINE, cur, start};
+                out->segs[out->count++] = s;
+            }
+            cur = start;
+            continue;
+        }
+        double x = 0, y = 0;
+        if (cmd == 'H' || cmd == 'h' || cmd == 'V' || cmd == 'v') {
+            double v = 0;
+            p = skip_sep(p);
+            p = read_num(p, &v);
+            if (!p) FAIL(-4);
+            if (cmd == 'H')      { x = v;         y = cur.y; }
+            else if (cmd == 'h') { x = cur.x + v; y = cur.y; }
+            else if (cmd == 'V') { x = cur.x;     y = v; }
+            else                 { x = cur.x;     y = cur.y + v; }
+        } else {
+            p = skip_sep(p);
+            p = read_num(p, &x);
+            if (!p) FAIL(-4);
+            p = skip_sep(p);
+            p = read_num(p, &y);
+            if (!p) FAIL(-4);
+            if (cmd == 'm' || cmd == 'l') { x += cur.x; y += cur.y; }
+        }
+        if (cmd == 'M' || cmd == 'm') {
+            /* 每个 moveto 开启新子路径：Z 的闭合起点随之更新 */
+            start.x = x; start.y = y;
+            cur.x = x; cur.y = y;
+            continue;
+        }
+        if (out->count < 255) {
+            VSeg s = {SV_LINE, cur, {x, y}};
+            out->segs[out->count++] = s;
+        }
+        cur.x = x; cur.y = y;
+        if (out->count >= 255) FAIL(-5);
+    }
+    return 0;
+#undef FAIL
+}
+
+int svg_parse(const char *d, VPath *out) { return svg_parse_ex(d, out, 0); }
+
+#else /* !SVG_REL：初版解析器，原样保留 */
+
 int svg_parse(const char *d, VPath *out) {
     if (!d || !out) return -1;
     out->count = 0;
@@ -59,6 +126,8 @@ int svg_parse(const char *d, VPath *out) {
     }
     return 0;
 }
+
+#endif /* SVG_REL */
 
 int svg_fill(const VPath *p, int w, int h, unsigned char *buf) {
     if (!p || !buf || w <= 0 || h <= 0) return -1;
