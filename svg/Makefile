@@ -20,7 +20,14 @@ build/demo: $(SRC) demo.c $(HDR)
 	@mkdir -p build
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) demo.c -lm -o $@
 
+bench: build/bench
+	./build/bench
+
+build/bench: $(SRC) bench.c $(HDR)
+	@mkdir -p build
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) bench.c -lm -o $@
+
 clean:
 	rm -rf build demo.txt demo.pgm
 
-.PHONY: all test demo clean
+.PHONY: all test demo bench clean
