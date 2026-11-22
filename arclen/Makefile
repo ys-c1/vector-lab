@@ -20,7 +20,14 @@ build/demo: $(SRC) demo.c $(HDR)
 	@mkdir -p build
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) demo.c -lm -o $@
 
+adapt-demo: build/adapt_demo
+	./build/adapt_demo
+
+build/adapt_demo: $(SRC) adapt_demo.c $(HDR)
+	@mkdir -p build
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) adapt_demo.c -lm -o $@
+
 clean:
 	rm -rf build demo.txt
 
-.PHONY: all test demo clean
+.PHONY: all test demo adapt-demo clean
