@@ -56,9 +56,21 @@ static int cmd_area(const char *path) {
 }
 
 static int cmd_pixels(const char *path, int w, int h) {
+    /* 当场停并指名参数：宽或高为零/负。 */
+    if (w <= 0) {
+        fprintf(stderr, "error: width must be positive, got %d (param: width)\n", w);
+        return 2;
+    }
+    if (h <= 0) {
+        fprintf(stderr, "error: height must be positive, got %d (param: height)\n", h);
+        return 2;
+    }
     P p[MAXP];
     int n = load(path, p);
-    if (n < 3 || w <= 0 || h <= 0) return 2;
+    if (n < 3) {
+        fprintf(stderr, "error: polygon needs at least 3 points (param: poly)\n");
+        return 2;
+    }
     double minx = p[0].x, maxx = p[0].x, miny = p[0].y, maxy = p[0].y;
     for (int i = 1; i < n; ++i) {
         if (p[i].x < minx) minx = p[i].x;

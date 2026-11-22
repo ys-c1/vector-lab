@@ -22,5 +22,4 @@ build/demo: $(SRC) demo.c $(HDR)
 
 clean:
 	rm -rf build demo.txt demo.pgm
-
 .PHONY: all test demo clean
