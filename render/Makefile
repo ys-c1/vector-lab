@@ -1,7 +1,7 @@
 CC ?= gcc
 CFLAGS ?= -O2 -Wall -Wextra -std=c11
-CPPFLAGS ?= -Isrc
-SRC := $(wildcard src/*.c)
+CPPFLAGS ?= -Isrc -I../fit/src
+SRC := $(wildcard src/*.c) ../fit/src/fit.c
 HDR := $(wildcard src/*.h)
 
 all: test
@@ -17,7 +17,9 @@ build/cli: $(SRC) cli.c $(HDR)
 	@mkdir -p build
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) cli.c -lm -o $@
 
+cli: build/cli
+
 clean:
 	rm -rf build *.pgm
 
-.PHONY: all test clean
+.PHONY: all test cli clean

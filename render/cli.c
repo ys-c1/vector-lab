@@ -3,12 +3,14 @@
 #include "src/export.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int main(int argc, char **argv) {
     if (argc < 6) {
-        fprintf(stderr, "usage: %s scene.txt out.pgm w h scale\n", argv[0]);
+        fprintf(stderr, "usage: %s scene.txt out.pgm w h scale [--fit]\n", argv[0]);
         return 1;
     }
+    int opt_rot = (argc >= 7 && strcmp(argv[6], "--fit") == 0);
     FILE *f = fopen(argv[1], "r");
     if (!f) { fprintf(stderr, "open scene failed\n"); return 2; }
     RScene s;
@@ -29,12 +31,21 @@ int main(int argc, char **argv) {
     fclose(f);
     int w = atoi(argv[3]), h = atoi(argv[4]);
     double sc = atof(argv[5]);
-    RBox win;
-    if (scene_bbox(&s, &win) != 0) return 4;
     unsigned char *buf = (unsigned char*)malloc((size_t)w * h);
     if (!buf) return 5;
     RPlace place = {0.0, 0.0, 0.0, sc};
-    if (pipeline_render(&s, place, win, w, h, buf) != 0) { free(buf); return 6; }
+    int rc;
+    if (opt_rot) {
+        double ang = 0.0;
+        rc = pipeline_render_fit(&s, place, w, h, 1, buf, &ang);
+        if (rc == 0)
+            printf("fit angle=%.6f rad (%.3f deg)\n", ang, ang * 180.0 / 3.14159265358979323846);
+    } else {
+        RBox win;
+        if (scene_bbox(&s, &win) != 0) { free(buf); return 4; }
+        rc = pipeline_render(&s, place, win, w, h, buf);
+    }
+    if (rc != 0) { free(buf); return 6; }
     if (export_pgm(argv[2], buf, w, h) != 0) { free(buf); return 7; }
     printf("polys %d verts %d on %d\n", s.npolys, scene_count_verts(&s), export_count_on(buf, w, h));
     free(buf);
