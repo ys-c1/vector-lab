@@ -1,0 +1,12 @@
+# g5：有环夹具，L2 -> L4 -> L3 -> L2 构成回路；auto/dot 必须拒绝并指出环上图层
+win 0 0 40 30
+layer L0 40  2 2 16 2 16 14 2 14
+layer L1 80  6 5 20 5 20 16 6 16
+layer L2 120 10 8 24 10 24 18 10 18
+layer L3 160 14 6 28 6 28 20 14 20
+layer L4 200 18 10 32 10 32 22 18 22
+edge L0 L1
+edge L1 L2
+edge L2 L4
+edge L4 L3
+edge L3 L2

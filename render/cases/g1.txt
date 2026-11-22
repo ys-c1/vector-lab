@@ -1,0 +1,16 @@
+# g1：链式 + 菱形混合，无孤立图层；每相邻两层矩形交叠，遮挡顺序敏感
+win 0 0 40 30
+layer L0 40  2 2 18 2 18 22 2 22
+layer L1 80  8 4 24 4 24 20 8 20
+layer L2 120 6 8 20 8 20 26 6 26
+layer L3 160 14 6 30 6 30 18 14 18
+layer L4 200 10 10 26 10 26 24 10 24
+layer L5 230 16 8 32 8 32 26 16 26
+edge L0 L1
+edge L0 L2
+edge L1 L3
+edge L2 L3
+edge L3 L4
+edge L3 L5
+edge L4 L5
+order L0 L1 L2 L3 L4 L5

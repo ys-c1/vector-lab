@@ -1,0 +1,22 @@
+# g4：深链 + 侧链 + 孤立图层 L9，层数最多
+win 0 0 40 30
+layer L0 25  1 1 12 1 12 10 1 10
+layer L1 50  4 3 15 3 15 12 4 12
+layer L2 75  7 5 18 5 18 14 7 14
+layer L3 100 10 7 21 7 21 16 10 16
+layer L4 125 13 9 24 9 24 18 13 18
+layer L5 150 16 11 27 11 27 20 16 20
+layer L6 175 19 13 30 13 30 22 19 22
+layer L7 90  2 18 12 18 12 27 2 27
+layer L8 200 22 15 32 15 32 24 22 24
+layer L9 45  33 24 38 24 38 29 33 29
+edge L0 L1
+edge L1 L2
+edge L2 L3
+edge L3 L4
+edge L4 L5
+edge L5 L6
+edge L6 L8
+edge L7 L4
+edge L2 L7
+order L0 L9 L1 L2 L3 L7 L4 L5 L6 L8

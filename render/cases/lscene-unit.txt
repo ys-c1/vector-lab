@@ -1,0 +1,5 @@
+win 0 0 10 10
+layer A 100 1 1 7 1 7 7 1 7
+layer B 200 3 3 9 3 9 9 3 9
+edge A B
+order A B
