@@ -17,7 +17,14 @@ build/cli: $(SRC) cli.c $(HDR)
 	@mkdir -p build
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) cli.c -lm -o $@
 
+demo: build/demo
+	./build/demo
+
+build/demo: $(SRC) demo.c $(HDR)
+	@mkdir -p build
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) demo.c -lm -o $@
+
 clean:
 	rm -rf build *.pgm
 
-.PHONY: all test clean
+.PHONY: all test demo clean
