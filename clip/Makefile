@@ -20,7 +20,19 @@ build/demo: $(SRC) demo.c $(HDR)
 	@mkdir -p build
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) demo.c -lm -o $@
 
-clean:
-	rm -rf build demo.txt
+run: build/run
+	@echo "driver ready: ./build/run clip|cmp ..."
 
-.PHONY: all test demo clean
+build/run: $(SRC) run.c $(HDR)
+	@mkdir -p build
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) run.c -lm -o $@
+
+# 故障注入：工作内存膨胀的裁剪实现，用于验证四倍预算拒绝路径
+build/run_fault: run.c tests/fault_clip.c $(HDR)
+	@mkdir -p build
+	$(CC) $(CPPFLAGS) $(CFLAGS) tests/fault_clip.c run.c -lm -o $@
+
+clean:
+	rm -rf build demo.txt run-out
+
+.PHONY: all test demo run clean

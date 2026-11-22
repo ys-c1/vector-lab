@@ -1,0 +1,17 @@
+{
+  "root": "/home/ys/feedback/uidreczz28cbmQAEptq",
+  "B": "/home/ys/feedback/uidreczz28cbmQAEptq",
+  "sha": "aa6d1880895b7a8757f21f48553eddcda4947c17",
+  "wslDistro": "Ubuntu-26.04",
+  "source": {
+    "owner": "ys-c1",
+    "repo": "vector-lab",
+    "sha": "aa6d1880895b7a8757f21f48553eddcda4947c17"
+  },
+  "fork": {
+    "owner": "ys-c1",
+    "repo": "vector-lab",
+    "cloneUrl": "https://github.com/ys-c1/vector-lab.git"
+  },
+  "at": "2026-11-22T05:30:42.694Z"
+}
