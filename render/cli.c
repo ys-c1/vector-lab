@@ -1,12 +1,16 @@
 #include "src/scene.h"
 #include "src/pipeline.h"
 #include "src/export.h"
+#include "../winfit/src/winfit.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 int main(int argc, char **argv) {
-    if (argc < 6) {
-        fprintf(stderr, "usage: %s scene.txt out.pgm w h scale\n", argv[0]);
+    if (argc != 6 && argc != 11) {
+        fprintf(stderr,
+                "usage (固定窗口): %s scene.txt out.pgm w h scale\n"
+                "usage (反解窗口): %s scene.txt out.pgm w h scale lo hi rho_t ux uy\n",
+                argv[0], argv[0]);
         return 1;
     }
     FILE *f = fopen(argv[1], "r");
@@ -31,6 +35,30 @@ int main(int argc, char **argv) {
     double sc = atof(argv[5]);
     RBox win;
     if (scene_bbox(&s, &win) != 0) return 4;
+
+    if (argc == 11) {
+        /* 新逻辑：按目标占屏区间反解窗口四边 */
+        double lo = atof(argv[6]), hi = atof(argv[7]);
+        double rho_t = atof(argv[8]), ux = atof(argv[9]), uy = atof(argv[10]);
+        WFBox bb = {win.minx, win.miny, win.maxx, win.maxy};
+        WFBox fitted;
+        int rc = winfit_fit(&bb, lo, hi, rho_t, ux, uy, &fitted);
+        if (rc != WF_OK) {
+            fprintf(stderr, "winfit 拒绝: %s\n", winfit_strerror(rc));
+            return 8;
+        }
+        if (winfit_in_range(&bb, &fitted, lo, hi) != 1) {
+            fprintf(stderr, "winfit 拒绝: 反解占屏比例未落入给定区间\n");
+            return 9;
+        }
+        win.minx = fitted.minx; win.miny = fitted.miny;
+        win.maxx = fitted.maxx; win.maxy = fitted.maxy;
+        printf("fitted window [%.6f %.6f %.6f %.6f] occupancy %.4f%%\n",
+               win.minx, win.miny, win.maxx, win.maxy,
+               winfit_occupancy(&bb, &fitted) * 100.0);
+    }
+    /* argc == 6 时 win 保持 scene_bbox 原值：固定窗口老路径，逻辑零改动 */
+
     unsigned char *buf = (unsigned char*)malloc((size_t)w * h);
     if (!buf) return 5;
     RPlace place = {0.0, 0.0, 0.0, sc};

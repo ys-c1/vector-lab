@@ -13,9 +13,9 @@ build/test: $(SRC) test.c $(HDR)
 	@mkdir -p build
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) test.c -lm -o $@
 
-build/cli: $(SRC) cli.c $(HDR)
+build/cli: $(SRC) cli.c $(HDR) ../winfit/src/winfit.c ../winfit/src/winfit.h
 	@mkdir -p build
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) cli.c -lm -o $@
+	$(CC) $(CPPFLAGS) -I../winfit/src $(CFLAGS) $(SRC) ../winfit/src/winfit.c cli.c -lm -o $@
 
 clean:
 	rm -rf build *.pgm
