@@ -8,5 +8,6 @@
 | stroke | demo.txt | 折线描边到多边形轮廓 |
 | dash | demo.txt | 虚线切分与相位控制 |
 | bbox | demo.txt | 点集包围盒与旋转盒 |
+| freq | demo_*.pgm | 频域定截止滤波：按能量分布选截止，四类纹理对照空域，逐字节兼容旧路径 |
 
 每个模块：`make -C <模块> test`，演示：`make -C <模块> demo`。
