@@ -1,0 +1,8 @@
+# 验收清单：name path lo hi
+# gradient：宽分布，目标亮像素占比 30%~32%
+gradient demo/data/gradient.pgm 0.30 0.32
+# bimodal：可达占比只有 1.0 / 0.5 / 0.0，目标 30%~35% 必然落空 -> 拒绝
+bimodal demo/data/bimodal.pgm 0.30 0.35
+# 纯黑 / 纯白：单独报告，不参与反解
+black demo/data/black.pgm 0.30 0.32
+white demo/data/white.pgm 0.30 0.32
