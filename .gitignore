@@ -1,3 +1,5 @@
 build/
 *.o
 demo.txt
+*.pgm
+!stroke/baseline/*.pgm
