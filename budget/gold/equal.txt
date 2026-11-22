@@ -1,0 +1,32 @@
+tier 1 budget 40.00
+  tess       x=   6.67 gain=  53.33
+  aa         x=   6.67 gain= 106.67
+  gamma      x=   6.67 gain=  40.00
+  dither     x=   6.67 gain=   1.67
+  watermark  x=   6.67 gain=   0.00
+  grid       x=   6.67 gain=   0.00
+  total gain 201.67
+tier 2 budget 80.00
+  tess       x=  13.33 gain= 106.67
+  aa         x=  13.33 gain= 173.33
+  gamma      x=  13.33 gain=  63.33
+  dither     x=  13.33 gain=   3.33
+  watermark  x=  13.33 gain=   0.00
+  grid       x=  13.33 gain=   0.00
+  total gain 346.67
+tier 3 budget 120.00
+  tess       x=  20.00 gain= 160.00
+  aa         x=  20.00 gain= 200.00
+  gamma      x=  20.00 gain=  70.00
+  dither     x=  20.00 gain=   5.00
+  watermark  x=  20.00 gain=   0.00
+  grid       x=  20.00 gain=   0.00
+  total gain 435.00
+tier 4 budget 200.00
+  tess       x=  33.33 gain= 186.67
+  aa         x=  33.33 gain= 253.33
+  gamma      x=  33.33 gain=  83.33
+  dither     x=  33.33 gain=   8.33
+  watermark  x=  33.33 gain=   0.00
+  grid       x=  33.33 gain=   0.00
+  total gain 531.67
