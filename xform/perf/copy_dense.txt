@@ -1,0 +1,4 @@
+scenario=dense (copy baseline, dense 16B/point layout) n=100000 input_bytes=1600000
+VmHWM before/after/run: 1632/5016/5080 KiB
+peak_attributable=3448 KiB  peak/input=2.207 (two full arrays)
+copy_kernel_time=0.0720 ms  traffic=4.80 MB (48B/point)

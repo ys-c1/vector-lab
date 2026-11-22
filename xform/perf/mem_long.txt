@@ -1,0 +1,4 @@
+scenario=long n=10000000 input_bytes=160000000 (152.59 MiB)
+VmHWM_before_alloc=1628 KiB  after_alloc=158136 KiB  after_xform=158136 KiB
+peak_attributable=156508 KiB (152.84 MiB)  peak/input=1.002
+during_xform: alloc_calls=0 alloc_bytes=0 copy_calls=0 copy_bytes=0

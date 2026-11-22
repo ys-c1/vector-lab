@@ -1,0 +1,4 @@
+scenario=nan n=100000 input_bytes=1600000 (1.53 MiB)
+VmHWM_before_alloc=1628 KiB  after_alloc=3448 KiB  after_xform=3448 KiB
+peak_attributable=1820 KiB (1.78 MiB)  peak/input=1.165
+during_xform: alloc_calls=0 alloc_bytes=0 copy_calls=0 copy_bytes=0

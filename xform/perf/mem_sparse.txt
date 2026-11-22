@@ -1,0 +1,4 @@
+scenario=sparse n=100000 input_bytes=6400000 (6.10 MiB)
+VmHWM_before_alloc=1628 KiB  after_alloc=8136 KiB  after_xform=8136 KiB
+peak_attributable=6508 KiB (6.36 MiB)  peak/input=1.041
+during_xform: alloc_calls=0 alloc_bytes=0 copy_calls=0 copy_bytes=0
