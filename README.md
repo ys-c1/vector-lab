@@ -8,5 +8,6 @@
 | stroke | demo.txt | 折线描边到多边形轮廓 |
 | dash | demo.txt | 虚线切分与相位控制 |
 | bbox | demo.txt | 点集包围盒与旋转盒 |
+| spick | demo.txt, hits_k*.csv | 屏幕空间容差拾取：逆矩阵 + 雅可比换算，两档缩放比 |
 
 每个模块：`make -C <模块> test`，演示：`make -C <模块> demo`。
