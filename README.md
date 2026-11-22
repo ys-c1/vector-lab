@@ -8,5 +8,7 @@
 | stroke | demo.txt | 折线描边到多边形轮廓 |
 | dash | demo.txt | 虚线切分与相位控制 |
 | bbox | demo.txt | 点集包围盒与旋转盒 |
+| render | *.pgm | 场景/多边形光栅化、管线与 8 位 PGM 导出 |
+| rdq | demo.txt | 4 位灰度的按块率失真位深分配 + 误差扩散 |
 
 每个模块：`make -C <模块> test`，演示：`make -C <模块> demo`。
