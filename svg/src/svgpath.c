@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef SVGPATH_MULTILAYER
+#include <math.h>
+#endif
 
 static const char *skip_sep(const char *p) {
     while (*p && (isspace((unsigned char)*p) || *p == ',')) ++p;
@@ -91,3 +94,61 @@ int svg_save_pgm(const char *path, const unsigned char *buf, int w, int h) {
     fclose(f);
     return 0;
 }
+
+#ifdef SVGPATH_MULTILAYER
+/* VPath 的 segs 只存线段（M 不产生段），子路径边界 = 段首与上段末不重合。*/
+static int split_subpaths(const VPath *p, int *start, int *cnt, int maxsub) {
+    int nsub = 0;
+    int i = 0;
+    while (i < p->count) {
+        if (nsub >= maxsub) return -1;
+        start[nsub] = i;
+        int j = i + 1;
+        while (j < p->count) {
+            VPoint prev = p->segs[j - 1].b, cur = p->segs[j].a;
+            double eps = 1e-12;
+            if (fabs(prev.x - cur.x) > eps || fabs(prev.y - cur.y) > eps) break;
+            ++j;
+        }
+        cnt[nsub] = j - i;
+        ++nsub;
+        i = j;
+    }
+    return nsub;
+}
+
+static int in_subpath(const VPath *p, int lo, int n, double sx, double sy) {
+    int cross = 0;
+    for (int k = 0; k < n; ++k) {
+        VSeg s = p->segs[lo + k];
+        double y0 = s.a.y, y1 = s.b.y;
+        if ((y0 > sy) == (y1 > sy)) continue;
+        double t = (sy - y0) / (y1 - y0);
+        double xc = s.a.x + (s.b.x - s.a.x) * t;
+        if (xc > sx) ++cross;
+    }
+    return cross & 1;
+}
+
+int svg_fill_layers(const VPath *p, int w, int h, unsigned char *buf) {
+    if (!p || !buf || w <= 0 || h <= 0) return -1;
+    int start[256], cnt[256];
+    int nsub = split_subpaths(p, start, cnt, 256);
+    if (nsub < 0) return -2;
+    memset(buf, 0, (size_t)w * (size_t)h);
+    for (int y = 0; y < h; ++y) {
+        double sy = y + 0.5;
+        for (int x = 0; x < w; ++x) {
+            double sx = x + 0.5;
+            int depth = 0; /* 包含该像素的子轮廓数 = 嵌套层号（0 = 全在外）*/
+            for (int s = 0; s < nsub; ++s)
+                depth += in_subpath(p, start[s], cnt[s], sx, sy);
+            if (depth == 0) continue;
+            /* 每层不同灰阶，使内层轮廓可独立核验：255,204,153,... */
+            int v = 255 - (depth - 1) * 51;
+            buf[y * w + x] = (unsigned char)(v < 51 ? 51 : v);
+        }
+    }
+    return 0;
+}
+#endif

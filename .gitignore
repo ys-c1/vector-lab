@@ -1,3 +1,6 @@
 build/
 *.o
 demo.txt
+/svg/demo.pgm
+/svg/demo-layers.pgm
+/contour/layers.txt
