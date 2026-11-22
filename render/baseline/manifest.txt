@@ -1,0 +1,6 @@
+# name  scene  w  h  scale
+jag32   data/jag.txt  32 32 1.0
+jag64   data/jag.txt  64 64 1.0
+tri48x32 data/tri.txt 48 32 1.0
+two40x40 data/two.txt 40 40 1.0
+jag24s2 data/jag.txt  24 24 2.0

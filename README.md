@@ -8,5 +8,6 @@
 | stroke | demo.txt | 折线描边到多边形轮廓 |
 | dash | demo.txt | 虚线切分与相位控制 |
 | bbox | demo.txt | 点集包围盒与旋转盒 |
+| render | *.pgm | 场景栅格化；预算内反解出图尺寸与超采样搭配 |
 
 每个模块：`make -C <模块> test`，演示：`make -C <模块> demo`。
