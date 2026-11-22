@@ -3,7 +3,9 @@
  *   ref area  <poly.txt>          输出面积，6 位小数
  *   ref pixels <poly.txt> <w> <h> 输出 PGM，8x8 超采样
  *   ref points <line.txt> <n>     输出 n 等分点（按累计弧长）
+ *   ref xform <pts.txt> <a..f>    仿射变换点文件（long double 参照）
  * 输入格式：每行 "x y"，多边形首尾自动闭合。
+ * 点文件格式：首行点数 n，随后 n 行 "x y"。
  */
 #include <math.h>
 #include <stdio.h>
@@ -115,10 +117,35 @@ static int cmd_points(const char *path, int n) {
     return 0;
 }
 
+static int cmd_xform(const char *path, const char **mv) {
+    /* 与主模块刻意不同：long double 逐点直算，动态读入，行数不限。 */
+    FILE *f = fopen(path, "r");
+    if (!f) return 2;
+    size_t n = 0;
+    if (fscanf(f, "%zu", &n) != 1 || n == 0) { fclose(f); return 2; }
+    P *p = (P *)malloc(n * sizeof *p);
+    if (!p) { fclose(f); return 3; }
+    size_t got = 0;
+    while (got < n && fscanf(f, "%lf %lf", &p[got].x, &p[got].y) == 2) ++got;
+    fclose(f);
+    if (got != n) { free(p); return 2; }
+    long double a = strtold(mv[0], 0), b = strtold(mv[1], 0), c = strtold(mv[2], 0),
+                d = strtold(mv[3], 0), e = strtold(mv[4], 0), g = strtold(mv[5], 0);
+    printf("%zu\n", n);
+    for (size_t i = 0; i < n; ++i) {
+        long double x = a * p[i].x + c * p[i].y + e;
+        long double y = b * p[i].x + d * p[i].y + g;
+        printf("%.6Lf %.6Lf\n", x, y);
+    }
+    free(p);
+    return 0;
+}
+
 int main(int argc, char **argv) {
     if (argc < 3) return 1;
     if (!strcmp(argv[1], "area")) return cmd_area(argv[2]);
     if (!strcmp(argv[1], "pixels") && argc >= 5) return cmd_pixels(argv[2], atoi(argv[3]), atoi(argv[4]));
     if (!strcmp(argv[1], "points") && argc >= 4) return cmd_points(argv[2], atoi(argv[3]));
+    if (!strcmp(argv[1], "xform") && argc >= 9) return cmd_xform(argv[2], (const char **)&argv[3]);
     return 1;
 }
