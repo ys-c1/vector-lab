@@ -31,3 +31,24 @@ int raster_fill(const RScene *s, const RBox *box, int w, int h, int ss, unsigned
         }
     return 0;
 }
+
+int raster_fill_cov(const RScene *s, const RBox *box, int w, int h, int ss,
+                    double phx, double phy, unsigned char *buf) {
+    if (!s || !box || !buf || w <= 0 || h <= 0 || ss < 1 || ss > 8) return -1;
+    memset(buf, 0, (size_t)w * (size_t)h);
+    double dx = (box->maxx - box->minx) / w;
+    double dy = (box->maxy - box->miny) / h;
+    for (int y = 0; y < h; ++y)
+        for (int x = 0; x < w; ++x) {
+            int hit = 0;
+            for (int j = 0; j < ss; ++j)
+                for (int i = 0; i < ss; ++i) {
+                    double px = box->minx + (x + (i + phx) / ss) * dx;
+                    double py = box->miny + (y + (j + phy) / ss) * dy;
+                    for (int k = 0; k < s->npolys; ++k)
+                        if (inside(&s->polys[k], px, py)) { ++hit; break; }
+                }
+            buf[y * w + x] = (unsigned char)(255 * hit / (ss * ss));
+        }
+    return 0;
+}
