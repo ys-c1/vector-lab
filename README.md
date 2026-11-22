@@ -8,5 +8,7 @@
 | stroke | demo.txt | 折线描边到多边形轮廓 |
 | dash | demo.txt | 虚线切分与相位控制 |
 | bbox | demo.txt | 点集包围盒与旋转盒 |
+| blend | demo.txt | 混合模式矩阵化、连乘顺序反解（Delta E 色差）与不可逆拒绝 |
 
 每个模块：`make -C <模块> test`，演示：`make -C <模块> demo`。
+blend 另有 `make -C blend regress`：固定顺序输出与快照逐字节比对。

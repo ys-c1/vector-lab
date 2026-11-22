@@ -1,0 +1,6 @@
+# BLEND_FIXED set: legacy fixed-order path
+FIXED A order: 0:multiply 1:plus 2:screen -> (0.816000 0.615000 0.226000)
+FIXED B order: 0:multiply 1:screen 2:exclusion 3:plus -> (0.640100 0.536250 0.370200)
+FIXED C order: 0:multiply 1:color-dodge 2:plus -> (1.000000 0.683333 0.220000)
+FIXED D order: 0:multiply 1:normal 2:plus -> (0.450000 0.500000 0.420000)
+FIXED E order: 0:multiply -> (0.450000 0.250000 0.100000)
