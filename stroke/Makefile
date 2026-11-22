@@ -1,8 +1,8 @@
 CC ?= gcc
 CFLAGS ?= -O2 -Wall -Wextra -std=c11
-CPPFLAGS ?= -Isrc
-SRC := $(wildcard src/*.c)
-HDR := $(wildcard src/*.h)
+CPPFLAGS ?= -Isrc -I../xform/src
+SRC := $(wildcard src/*.c) ../xform/src/xform.c
+HDR := $(wildcard src/*.h) ../xform/src/xform.h
 
 all: test
 
