@@ -1,3 +1,5 @@
 build/
 *.o
 demo.txt
+demo.csv
+demo.pgm

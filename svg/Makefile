@@ -14,13 +14,13 @@ build/test: $(SRC) test.c $(HDR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) test.c -lm -o $@
 
 demo: build/demo
-	./build/demo
+	./build/demo | tee demo.txt
 
 build/demo: $(SRC) demo.c $(HDR)
 	@mkdir -p build
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) demo.c -lm -o $@
 
 clean:
-	rm -rf build demo.txt demo.pgm
+	rm -rf build demo.txt demo.pgm demo.csv
 
 .PHONY: all test demo clean
