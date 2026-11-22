@@ -1,6 +1,7 @@
 /* 独立参照实现：与主代码不同算法，只负责产出可比对的文件。
  * 用法：
- *   ref area  <poly.txt>          输出面积，6 位小数
+ *   ref area  <poly.txt>          输出面积，6 位小数（256x256 数格子）
+ *   ref trap  <poly.txt>          输出面积，6 位小数（按顶点 y 切条的梯形积分）
  *   ref pixels <poly.txt> <w> <h> 输出 PGM，8x8 超采样
  *   ref points <line.txt> <n>     输出 n 等分点（按累计弧长）
  * 输入格式：每行 "x y"，多边形首尾自动闭合。
@@ -52,6 +53,46 @@ static int cmd_area(const char *path) {
             if (inside(p, n, minx + (i + 0.5) * dx, miny + (j + 0.5) * dy)) ++hit;
     double area = (double)hit / (double)(SS * SS) * (maxx - minx) * (maxy - miny);
     printf("%.6f\n", area);
+    return 0;
+}
+
+static int cmpd(const void *a, const void *b) {
+    double x = *(const double *)a, y = *(const double *)b;
+    return (x > y) - (x < y);
+}
+
+/* 竖条梯形积分：用顶点 y 坐标把多边形切成横条，条内无顶点，
+ * 交点配对与宽度函数对 y 都线性，故每取条中点一次即精确。 */
+static int cmd_trap(const char *path) {
+    P p[MAXP];
+    int n = load(path, p);
+    if (n < 3) return 2;
+    double *ys = (double *)malloc(sizeof(double) * (size_t)n);
+    double *xs = (double *)malloc(sizeof(double) * (size_t)n);
+    if (!ys || !xs) { free(ys); free(xs); return 3; }
+    for (int i = 0; i < n; ++i) ys[i] = p[i].y;
+    qsort(ys, (size_t)n, sizeof(double), cmpd);
+    double total = 0.0;
+    for (int j = 0; j + 1 < n; ++j) {
+        double a = ys[j], b = ys[j + 1], h = b - a;
+        if (h <= 0.0) continue;
+        double y = a + h * 0.5;
+        int k = 0;
+        for (int i = 0; i < n; ++i) {
+            P u = p[i], v = p[(i + 1) % n];
+            if ((u.y > y) == (v.y > y)) continue;
+            double t = (y - u.y) / (v.y - u.y);
+            xs[k++] = u.x + (v.x - u.x) * t;
+        }
+        if (k < 2 || (k & 1)) continue;
+        qsort(xs, (size_t)k, sizeof(double), cmpd);
+        double w = 0.0;
+        for (int m = 0; m + 1 < k; m += 2) w += xs[m + 1] - xs[m];
+        total += w * h;
+    }
+    free(xs);
+    free(ys);
+    printf("%.6f\n", total);
     return 0;
 }
 
@@ -118,6 +159,7 @@ static int cmd_points(const char *path, int n) {
 int main(int argc, char **argv) {
     if (argc < 3) return 1;
     if (!strcmp(argv[1], "area")) return cmd_area(argv[2]);
+    if (!strcmp(argv[1], "trap")) return cmd_trap(argv[2]);
     if (!strcmp(argv[1], "pixels") && argc >= 5) return cmd_pixels(argv[2], atoi(argv[3]), atoi(argv[4]));
     if (!strcmp(argv[1], "points") && argc >= 4) return cmd_points(argv[2], atoi(argv[3]));
     return 1;
