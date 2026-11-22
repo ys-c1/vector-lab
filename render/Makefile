@@ -1,8 +1,8 @@
 CC ?= gcc
 CFLAGS ?= -O2 -Wall -Wextra -std=c11
-CPPFLAGS ?= -Isrc
-SRC := $(wildcard src/*.c)
-HDR := $(wildcard src/*.h)
+CPPFLAGS ?= -Isrc -I../hull/src
+SRC := $(wildcard src/*.c) ../hull/src/hull.c ../hull/src/simplify.c
+HDR := $(wildcard src/*.h) ../hull/src/hull.h ../hull/src/simplify.h
 
 all: test
 

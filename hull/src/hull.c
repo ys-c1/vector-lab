@@ -17,23 +17,30 @@ static double cross(HPoint o, HPoint a, HPoint b) {
 
 int hull_convex(const HPoint *pts, int n, HPoly *out) {
     if (!pts || !out || n < 1) return -1;
+    /* 单调链构造期临时需要 n+1 个槽（首尾点闭合重复，末尾再减 1），
+     * 直接写入 out->pts[64] 会在 n=64 时越界，故用独立工作数组。 */
     HPoint *s = (HPoint*)malloc(sizeof(HPoint) * (size_t)n);
-    if (!s) return -1;
+    HPoint *work = (HPoint*)malloc(sizeof(HPoint) * (size_t)(n + 1));
+    if (!s || !work) { free(s); free(work); return -1; }
     for (int i = 0; i < n; ++i) s[i] = pts[i];
     qsort(s, (size_t)n, sizeof(HPoint), cmp);
-    if (n == 1) { out->pts[0] = s[0]; out->count = 1; free(s); return 0; }
+    if (n == 1) { out->pts[0] = s[0]; out->count = 1; free(s); free(work); return 0; }
     int k = 0;
     for (int i = 0; i < n; ++i) {
-        while (k >= 2 && cross(out->pts[k-2], out->pts[k-1], s[i]) <= 0.0) --k;
-        out->pts[k++] = s[i];
+        while (k >= 2 && cross(work[k-2], work[k-1], s[i]) <= 0.0) --k;
+        work[k++] = s[i];
     }
     int lower = k + 1;
     for (int i = n - 2; i >= 0; --i) {
-        while (k >= lower && cross(out->pts[k-2], out->pts[k-1], s[i]) <= 0.0) --k;
-        out->pts[k++] = s[i];
+        while (k >= lower && cross(work[k-2], work[k-1], s[i]) <= 0.0) --k;
+        work[k++] = s[i];
     }
-    out->count = k - 1;
+    int count = k - 1;
+    if (count > 64) { free(s); free(work); return -1; }
+    for (int i = 0; i < count; ++i) out->pts[i] = work[i];
+    out->count = count;
     free(s);
+    free(work);
     return 0;
 }
 

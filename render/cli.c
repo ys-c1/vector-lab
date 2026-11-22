@@ -6,7 +6,8 @@
 
 int main(int argc, char **argv) {
     if (argc < 6) {
-        fprintf(stderr, "usage: %s scene.txt out.pgm w h scale\n", argv[0]);
+        fprintf(stderr, "usage: %s scene.txt out.pgm w h scale [area_ratio]\n", argv[0]);
+        fprintf(stderr, "  area_ratio omitted -> legacy full-vertex path (byte stable)\n");
         return 1;
     }
     FILE *f = fopen(argv[1], "r");
@@ -34,9 +35,23 @@ int main(int argc, char **argv) {
     unsigned char *buf = (unsigned char*)malloc((size_t)w * h);
     if (!buf) return 5;
     RPlace place = {0.0, 0.0, 0.0, sc};
-    if (pipeline_render(&s, place, win, w, h, buf) != 0) { free(buf); return 6; }
-    if (export_pgm(argv[2], buf, w, h) != 0) { free(buf); return 7; }
-    printf("polys %d verts %d on %d\n", s.npolys, scene_count_verts(&s), export_count_on(buf, w, h));
+    int rc;
+    if (argc >= 7) {
+        double ratio = atof(argv[6]);
+        int removed = 0;
+        rc = pipeline_render_simplified(&s, place, win, w, h, ratio, buf, &removed);
+        if (rc != 0) { free(buf); fprintf(stderr, "simplify failed rc=%d\n", rc); return 6; }
+        if (export_pgm(argv[2], buf, w, h) != 0) { free(buf); return 7; }
+        printf("polys %d verts %d->%d (removed %d) on %d ratio %.4f\n",
+               s.npolys, scene_count_verts(&s),
+               scene_count_verts(&s) - removed, removed,
+               export_count_on(buf, w, h), ratio);
+    } else {
+        rc = pipeline_render(&s, place, win, w, h, buf);
+        if (rc != 0) { free(buf); return 6; }
+        if (export_pgm(argv[2], buf, w, h) != 0) { free(buf); return 7; }
+        printf("polys %d verts %d on %d\n", s.npolys, scene_count_verts(&s), export_count_on(buf, w, h));
+    }
     free(buf);
     return 0;
 }

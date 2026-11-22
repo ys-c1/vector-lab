@@ -27,6 +27,19 @@ int main(void) {
     RBox bad = {0, 0, 0, 0};
     CK(pipeline_render(&s, p, bad, 16, 16, buf) == -3);
     CK(scene_add_poly(&s, sq, 2) == -1);
+
+    /* 精简路径：合法比例出图、非法比例拒绝、退化多边形拒绝 */
+    unsigned char buf2[16 * 16];
+    int removed = -1;
+    CK(pipeline_render_simplified(&s, p, b, 16, 16, 0.9, buf2, &removed) == 0);
+    CK(removed == 0); /* 正方形无共线点、无可剔顶点 */
+    CK(pipeline_render_simplified(&s, p, b, 16, 16, 1.5, buf2, &removed) == -2);
+    RPoint flatline[3] = {{0,0},{1,1},{2,2}};
+    RScene sf;
+    scene_init(&sf);
+    CK(scene_add_poly(&sf, flatline, 3) == 0);
+    RBox bf = {0, 0, 2, 2};
+    CK(pipeline_render_simplified(&sf, p, bf, 8, 8, 0.9, buf2, &removed) == -5);
     printf("%d checks, %d failures\n", checks, fails);
     return fails ? 1 : 0;
 }
