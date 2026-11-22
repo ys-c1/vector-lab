@@ -2,12 +2,47 @@
 #include "src/pipeline.h"
 #include "src/raster.h"
 #include "src/export.h"
+#include "src/interval.h"
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 static int fails = 0, checks = 0;
 #define CK(c) do { ++checks; if (!(c)) { ++fails; printf("FAIL %d %s\n", __LINE__, #c); } } while (0)
 
+static void interval_tests(void) {
+    /* 单值区间 */
+    Ival z = iv_s(3.0);
+    CK(z.lo == 3.0 && z.hi == 3.0 && iv_width(&z) == 0.0);
+    /* 加法向外扩：结果区间必须包住两端各一次最近舍入的结果 */
+    Ival a = iv_s(1.0), b = iv_s(10.0), r;
+    CK(iv_add(&a, &b, &r) == IVL_OK);
+    CK(r.lo <= 11.0 && r.hi >= 11.0 && iv_width(&r) > 0.0);
+    /* 区间运算包围性：取区间内两个点，其乘积必在结果区间内 */
+    Ival x = {0.999, 1.001}, y = {2.0, 2.0};
+    CK(iv_mul(&x, &y, &r) == IVL_OK);
+    CK(r.lo <= 0.999 * 2.0 && r.hi >= 1.001 * 2.0);
+    /* 除零区间必须被拒绝 */
+    Ival dz = {-1.0, 1.0}, one = iv_s(1.0);
+    CK(iv_div(&one, &dz, &r) == IVL_DIVZERO);
+    /* 三角区间包住 libm 直算值 */
+    Ival ang = iv_s(0.7), cs, sn;
+    CK(iv_cos(&ang, &cs) == IVL_OK && iv_sin(&ang, &sn) == IVL_OK);
+    CK(cs.lo <= cos(0.7) && cs.hi >= cos(0.7));
+    CK(sn.lo <= sin(0.7) && sn.hi >= sin(0.7));
+    /* 下溢截断：严格为正的最次正规区间乘 0.25，精确值已不可表达 */
+    double tiny = nextafter(4.9406564584124654e-324, INFINITY);
+    Ival t = {tiny, nextafter(tiny, INFINITY)}, q = iv_s(0.25);
+    CK(iv_mul(&t, &q, &r) == IVL_TRUNC);
+    /* 精确的 0 乘不截断 */
+    Ival zero = iv_s(0.0);
+    CK(iv_mul(&zero, &q, &r) == IVL_OK);
+    /* 非有限端点上报 */
+    Ival inf = {INFINITY, INFINITY};
+    CK(iv_add(&inf, &one, &r) == IVL_NONFINITE);
+}
+
 int main(void) {
+    interval_tests();
     RPoint sq[4] = {{0,0},{10,0},{10,10},{0,10}};
     RScene s;
     scene_init(&s);

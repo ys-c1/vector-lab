@@ -8,5 +8,6 @@
 | stroke | demo.txt | 折线描边到多边形轮廓 |
 | dash | demo.txt | 虚线切分与相位控制 |
 | bbox | demo.txt | 点集包围盒与旋转盒 |
+| render | PGM / audit | 场景仿射放置与超采样光栅化，区间算术误差审计（见 `render/README.md`） |
 
 每个模块：`make -C <模块> test`，演示：`make -C <模块> demo`。

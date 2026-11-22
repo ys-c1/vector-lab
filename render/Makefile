@@ -9,9 +9,16 @@ all: test
 test: build/test
 	./build/test
 
+audit: build/iaudit
+	./build/iaudit
+
 build/test: $(SRC) test.c $(HDR)
 	@mkdir -p build
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) test.c -lm -o $@
+
+build/iaudit: $(SRC) iaudit_main.c $(HDR)
+	@mkdir -p build
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) iaudit_main.c -lm -o $@
 
 build/cli: $(SRC) cli.c $(HDR)
 	@mkdir -p build
@@ -20,4 +27,4 @@ build/cli: $(SRC) cli.c $(HDR)
 clean:
 	rm -rf build *.pgm
 
-.PHONY: all test clean
+.PHONY: all test audit clean
