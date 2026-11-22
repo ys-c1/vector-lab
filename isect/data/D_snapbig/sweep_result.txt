@@ -1,0 +1,3 @@
+eps_star=1.0950135881229102
+misses=0
+candidates=28

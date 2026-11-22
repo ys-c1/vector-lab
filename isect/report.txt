@@ -1,0 +1,44 @@
+### A_general
+n=250 pairs=31125 truth=50 zero_segs=0 zero_pairs=0 zero_truth=0
+eps_req=1.092950319e-01 eps_star=1.092950319e-01 grid_eps=1.122e-01 grid_steps=563
+bind_pair=(96,97) bind_gap=1.092950319e-01 bind_zero=0
+min_seg_len=1.852407898e+00 cap_10pct=1.852407898e-01 rejected=0
+misses=0 candidates=50 candidate_zero_pairs=0 false_candidates=0
+grid_first_zero_misses=0 grid_candidates=50
+proof_below: eps_below=1.092950319e-01 bind_included_at_req=1 bind_missed_below=1 misses_below=1
+time_scan_best_ms=4.1708 time_gap_precompute_ms=7.9109
+VERDICT=ACCEPT 反解容差 1.093e-01 <= 一成红线 1.852e-01，漏判为 0
+
+### B_grazing
+n=180 pairs=16110 truth=60 zero_segs=0 zero_pairs=0 zero_truth=0
+eps_req=1.458251064e+00 eps_star=1.458251064e+00 grid_eps=1.496e+00 grid_steps=608
+bind_pair=(86,87) bind_gap=1.458251064e+00 bind_zero=0
+min_seg_len=1.583711931e+02 cap_10pct=1.583711931e+01 rejected=0
+misses=0 candidates=60 candidate_zero_pairs=0 false_candidates=0
+grid_first_zero_misses=0 grid_candidates=60
+proof_below: eps_below=1.458251064e+00 bind_included_at_req=1 bind_missed_below=1 misses_below=1
+time_scan_best_ms=2.4441 time_gap_precompute_ms=4.5666
+VERDICT=ACCEPT 反解容差 1.458e+00 <= 一成红线 1.584e+01，漏判为 0
+
+### C_endpoint
+n=80 pairs=3160 truth=37 zero_segs=6 zero_pairs=459 zero_truth=6
+eps_req=5.849991453e-04 eps_star=5.849991453e-04 grid_eps=5.957e-04 grid_steps=472
+bind_pair=(52,53) bind_gap=5.849991453e-04 bind_zero=0
+min_seg_len=2.499241809e+00 cap_10pct=2.499241809e-01 rejected=0
+misses=0 candidates=37 candidate_zero_pairs=6 false_candidates=0
+grid_first_zero_misses=0 grid_candidates=37
+proof_below: eps_below=5.849991453e-04 bind_included_at_req=1 bind_missed_below=1 misses_below=1
+time_scan_best_ms=0.5211 time_gap_precompute_ms=0.7057
+VERDICT=ACCEPT 反解容差 5.850e-04 <= 一成红线 2.499e-01，漏判为 0
+
+### D_snapbig
+n=64 pairs=2016 truth=18 zero_segs=4 zero_pairs=246 zero_truth=4
+eps_req=1.095013588e+00 eps_star=1.095013588e+00 grid_eps=1.122e+00 grid_steps=603
+bind_pair=(62,63) bind_gap=1.095013588e+00 bind_zero=1
+min_seg_len=2.992572647e+00 cap_10pct=2.992572647e-01 rejected=1
+misses=0 candidates=28 candidate_zero_pairs=4 false_candidates=10
+grid_first_zero_misses=0 grid_candidates=28
+proof_below: eps_below=1.095013588e+00 bind_included_at_req=1 bind_missed_below=1 misses_below=1
+time_scan_best_ms=0.3773 time_gap_precompute_ms=0.6051
+VERDICT=REJECT eps_req 超过最短非退化段长度的 10%（1.095e+00 > 2.993e-01），吸附容差不可接受
+
