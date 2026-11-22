@@ -3,7 +3,10 @@
  *   ref area  <poly.txt>          输出面积，6 位小数
  *   ref pixels <poly.txt> <w> <h> 输出 PGM，8x8 超采样
  *   ref points <line.txt> <n>     输出 n 等分点（按累计弧长）
- * 输入格式：每行 "x y"，多边形首尾自动闭合。
+ *   ref pgm-gamma <in.pgm> <out.pgm> <gamma>
+ *                                 逐级按 long double 幂运算编码 PGM
+ *                                 y = round(255*(x/255)^(1/gamma))
+ * 输入格式（多边形/折线）：每行 "x y"，多边形首尾自动闭合。
  */
 #include <math.h>
 #include <stdio.h>
@@ -115,10 +118,81 @@ static int cmd_points(const char *path, int n) {
     return 0;
 }
 
+/* 读 P5/maxval 255 的 PGM。成功返回 0，*buf 由 malloc 分配。 */
+static int read_pgm(const char *path, unsigned char **buf, int *w, int *h) {
+    FILE *f = fopen(path, "rb");
+    if (!f) {
+        fprintf(stderr, "error: cannot open %s (param: in)\n", path);
+        return -1;
+    }
+    char tag[16];
+    int W, H, maxv;
+    if (fscanf(f, "%15s %d %d %d", tag, &W, &H, &maxv) != 4 ||
+        strcmp(tag, "P5") != 0 || W <= 0 || H <= 0 || maxv != 255) {
+        fprintf(stderr, "error: %s is not a P5 maxval-255 PGM (param: in)\n", path);
+        fclose(f);
+        return -1;
+    }
+    /* fscanf 的 %d 停在数据前一字节的空白；吃掉恰好一个分隔字节。 */
+    if (fgetc(f) == EOF) { fclose(f); return -1; }
+    size_t n = (size_t)W * (size_t)H;
+    unsigned char *b = (unsigned char*)malloc(n);
+    if (!b || fread(b, 1, n, f) != n) {
+        fprintf(stderr, "error: truncated pixel data in %s (param: in)\n", path);
+        free(b);
+        fclose(f);
+        return -1;
+    }
+    fclose(f);
+    *buf = b;
+    *w = W;
+    *h = H;
+    return 0;
+}
+
+/* 逐级 long double 幂运算编码；gamma 非正/非有限明确拒绝并指名参数。 */
+static int cmd_pgm_gamma(const char *in, const char *out, const char *garg) {
+    char *end = NULL;
+    long double g = strtold(garg, &end);
+    if (!end || *end != '\0' || !(g > 0.0L) || !isfinite((double)g)) {
+        fprintf(stderr, "error: gamma must be positive and finite, got %s "
+                "(param: gamma)\n", garg);
+        return 2;
+    }
+    unsigned char *buf = NULL;
+    int w = 0, h = 0;
+    if (read_pgm(in, &buf, &w, &h) != 0) return 2;
+    size_t n = (size_t)w * (size_t)h;
+    for (size_t i = 0; i < n; ++i) {
+        unsigned v = buf[i];
+        if (v == 0 || v == 255 || g == 1.0L) continue;
+        long double y = 255.0L * powl((long double)v / 255.0L, 1.0L / g);
+        if (y <= 0.0L) buf[i] = 0;
+        else if (y >= 255.0L) buf[i] = 255;
+        else buf[i] = (unsigned char)(long)(y + 0.5L);
+    }
+    FILE *f = fopen(out, "wb");
+    if (!f) {
+        fprintf(stderr, "error: cannot write %s (param: out)\n", out);
+        free(buf);
+        return 2;
+    }
+    fprintf(f, "P5\n%d %d\n255\n", w, h);
+    size_t wrote = fwrite(buf, 1, n, f);
+    fclose(f);
+    free(buf);
+    if (wrote != n) {
+        fprintf(stderr, "error: short write to %s (param: out)\n", out);
+        return 2;
+    }
+    return 0;
+}
+
 int main(int argc, char **argv) {
     if (argc < 3) return 1;
     if (!strcmp(argv[1], "area")) return cmd_area(argv[2]);
     if (!strcmp(argv[1], "pixels") && argc >= 5) return cmd_pixels(argv[2], atoi(argv[3]), atoi(argv[4]));
     if (!strcmp(argv[1], "points") && argc >= 4) return cmd_points(argv[2], atoi(argv[3]));
+    if (!strcmp(argv[1], "pgm-gamma") && argc >= 5) return cmd_pgm_gamma(argv[2], argv[3], argv[4]);
     return 1;
 }
