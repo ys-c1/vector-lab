@@ -20,7 +20,22 @@ build/demo: $(SRC) demo.c $(HDR)
 	@mkdir -p build
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) demo.c -lm -o $@
 
-clean:
-	rm -rf build demo.txt
+run: build/ledger
+	@echo "ledger ready: ./build/ledger plan tests/ledger/plan.txt <outdir>"
 
-.PHONY: all test demo clean
+build/ledger: $(SRC) ledger.c $(HDR)
+	@mkdir -p build
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) ledger.c -lm -o $@
+
+# 故障注入构建：裁剪输出被轻微缩放，用来验证账目能停在正确的步号
+build/ledger_fault: ledger.c tests/fault_clip.c $(HDR)
+	@mkdir -p build
+	$(CC) $(CPPFLAGS) -DCLIP_FN=clip_convex_impl $(CFLAGS) src/clip.c ledger.c tests/fault_clip.c -lm -o $@
+
+verify: build/ledger build/ledger_fault
+	./verify.sh
+
+clean:
+	rm -rf build demo.txt run-out ledger-out
+
+.PHONY: all test demo run verify clean

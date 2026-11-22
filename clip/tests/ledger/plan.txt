@@ -1,0 +1,5 @@
+# 序列名 多边形文件 窗口清单
+seq1_axis2 poly_hex.txt seq1.txt
+seq2_rot120 poly_120.txt seq2.txt
+seq3_three poly_tri.txt seq3.txt
+seq4_cw poly_oct.txt seq4.txt
