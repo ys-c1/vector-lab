@@ -8,5 +8,6 @@
 | stroke | demo.txt | 折线描边到多边形轮廓 |
 | dash | demo.txt | 虚线切分与相位控制 |
 | bbox | demo.txt | 点集包围盒与旋转盒 |
+| isect | stdout | 线段求交、折线自交，交点数去重（半径反解 + 簇心） |
 
 每个模块：`make -C <模块> test`，演示：`make -C <模块> demo`。
