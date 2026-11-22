@@ -14,6 +14,7 @@ build/test: $(SRC) test.c $(HDR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) test.c -lm -o $@
 
 demo: build/demo
+	@mkdir -p build
 	./build/demo
 
 build/demo: $(SRC) demo.c $(HDR)
