@@ -8,5 +8,8 @@
 | stroke | demo.txt | 折线描边到多边形轮廓 |
 | dash | demo.txt | 虚线切分与相位控制 |
 | bbox | demo.txt | 点集包围盒与旋转盒 |
+| render | bench 报告 | 场景光栅化；剔除阈值按期望代价（错剔像素 + λ·漏剔）选取 |
+
+render 模块另有阈值评估：`make -C render bench`（参数：`bench [lambda] [t_hand]`，lambda<0 拒绝）。
 
 每个模块：`make -C <模块> test`，演示：`make -C <模块> demo`。
