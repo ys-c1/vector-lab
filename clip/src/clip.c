@@ -1,4 +1,6 @@
 #include "clip.h"
+#include "order.h"
+#include <stddef.h>
 
 static int inside(CPoint a, CPoint b, CPoint p) {
     double cr = (b.x - a.x) * (p.y - a.y) - (b.y - a.y) * (p.x - a.x);
@@ -16,13 +18,16 @@ static CPoint meet(CPoint a, CPoint b, CPoint c, CPoint d) {
     return r;
 }
 
-int clip_convex(const CPoint *poly, int n, const CPoint *win, int wn, CPoly *out) {
-    if (!poly || !win || !out || n < 3 || wn < 3) return -1;
+/* 共享裁剪核心：order 为 NULL 时按 0..wn-1 自然顺序处理窗口边，
+ * 与原固定顺序的操作序列完全一致；stages 非空时记录每阶段处理后的顶点数。 */
+static int clip_run(const CPoint *poly, int n, const CPoint *win, int wn,
+                    const int *order, CPoly *out, int *stages) {
     CPoly cur, nxt;
     cur.count = n;
     for (int i = 0; i < n; ++i) cur.pts[i] = poly[i];
     for (int e = 0; e < wn; ++e) {
-        CPoint a = win[e], b = win[(e + 1) % wn];
+        int ei = order ? order[e] : e;
+        CPoint a = win[ei], b = win[(ei + 1) % wn];
         nxt.count = 0;
         for (int i = 0; i < cur.count; ++i) {
             CPoint p = cur.pts[i], q = cur.pts[(i + 1) % cur.count];
@@ -36,11 +41,23 @@ int clip_convex(const CPoint *poly, int n, const CPoint *win, int wn, CPoly *out
             }
         }
         cur = nxt;
+        if (stages) stages[e] = cur.count;
         if (cur.count == 0) break;
     }
     out->count = cur.count;
     for (int i = 0; i < cur.count; ++i) out->pts[i] = cur.pts[i];
     return 0;
+}
+
+int clip_convex(const CPoint *poly, int n, const CPoint *win, int wn, CPoly *out) {
+    if (!poly || !win || !out || n < 3 || wn < 3) return -1;
+    return clip_run(poly, n, win, wn, NULL, out, NULL);
+}
+
+int clip_convex_ordered(const CPoint *poly, int n, const CPoint *win, int wn,
+                        const int *order, CPoly *out, int *stages) {
+    if (!poly || !win || !out || n < 3 || wn < 3) return -1;
+    return clip_run(poly, n, win, wn, order, out, stages);
 }
 
 double clip_area(const CPoly *p) {
