@@ -1,4 +1,5 @@
 #include "raster.h"
+#include "guard.h"
 #include <string.h>
 
 static int inside(const RPoly *p, double x, double y) {
@@ -14,11 +15,16 @@ static int inside(const RPoly *p, double x, double y) {
 
 int raster_fill(const RScene *s, const RBox *box, int w, int h, int ss, unsigned char *buf) {
     if (!s || !box || !buf || w <= 0 || h <= 0 || ss < 1 || ss > 8) return -1;
-    memset(buf, 0, (size_t)w * (size_t)h);
+    /* Pre-fill before any computation so a code path that fails to write a
+     * pixel exposes the sentinel instead of stale heap contents.  With the
+     * guard disabled this is the original zero fill. */
+    rguard_buffer(buf, (size_t)w * (size_t)h);
     double dx = (box->maxx - box->minx) / w;
     double dy = (box->maxy - box->miny) / h;
+    int skip = rguard_injected_skip_pixel();
     for (int y = 0; y < h; ++y)
         for (int x = 0; x < w; ++x) {
+            if (skip >= 0 && y * w + x == skip) continue; /* injected fault */
             int hit = 0;
             for (int j = 0; j < ss; ++j)
                 for (int i = 0; i < ss; ++i) {

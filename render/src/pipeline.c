@@ -1,5 +1,6 @@
 #include "pipeline.h"
 #include "raster.h"
+#include "guard.h"
 #include <math.h>
 
 static RPoint move(RPoint p, RPlace q) {
@@ -15,6 +16,9 @@ int pipeline_render(const RScene *s, RPlace place, RBox win, int w, int h, unsig
     if (place.scale == 0.0) return -2;
     if (!(win.maxx > win.minx) || !(win.maxy > win.miny)) return -3;
     RScene moved;
+    /* Sentinel-fill the working scene before it is populated: scene_init only
+     * sets npolys, so anything past it would otherwise be stale stack data. */
+    rguard_buffer(&moved, sizeof moved);
     scene_init(&moved);
     for (int k = 0; k < s->npolys; ++k) {
         RPoly tmp = s->polys[k];
