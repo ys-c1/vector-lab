@@ -17,7 +17,14 @@ build/cli: $(SRC) cli.c $(HDR)
 	@mkdir -p build
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) cli.c -lm -o $@
 
+bench: build/bench
+	./build/bench
+
+build/bench: $(SRC) bench.c $(HDR)
+	@mkdir -p build
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) bench.c -lm -o $@
+
 clean:
 	rm -rf build *.pgm
 
-.PHONY: all test clean
+.PHONY: all test bench clean
