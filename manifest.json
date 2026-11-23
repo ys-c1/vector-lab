@@ -1,0 +1,268 @@
+{
+  "schema_version": 1,
+  "project": "vector-lab",
+  "platform": {
+    "os": "linux",
+    "distro": "Debian/Ubuntu (apt)",
+    "arch": "x86_64",
+    "cc_standard": "c11"
+  },
+  "toolchain": {
+    "packages": [
+      {
+        "name": "gcc",
+        "apt": "gcc",
+        "provides": ["/usr/bin/gcc", "/usr/bin/cc"],
+        "required_by": "all",
+        "missing_error": "make: cc: No such file or directory / make: *** Error 127"
+      },
+      {
+        "name": "make",
+        "apt": "make",
+        "provides": ["/usr/bin/make"],
+        "required_by": "all",
+        "missing_error": "make: command not found"
+      },
+      {
+        "name": "libc6-dev",
+        "apt": "libc6-dev",
+        "provides_headers": ["math.h", "stdio.h", "stdlib.h", "string.h", "ctype.h"],
+        "provides_libs": ["libc.so", "libm.so (development symlink)"],
+        "required_by": "all",
+        "missing_header_error": "fatal error: math.h: No such file or directory",
+        "missing_lib_error": "undefined reference to `fmod' / `sincos' (cannot find -lm)"
+      },
+      {
+        "name": "coreutils",
+        "apt": "coreutils",
+        "provides": ["mkdir", "rm"],
+        "required_by": "all (Makefile build-dir creation/clean)",
+        "missing_error": "make: mkdir: No such file or directory"
+      },
+      {
+        "name": "diffutils",
+        "apt": "diffutils",
+        "provides": ["cmp"],
+        "required_by": "tools/diff.sh (image byte comparison)",
+        "missing_error": "tools/diff.sh: line N: cmp: command not found"
+      },
+      {
+        "name": "gawk",
+        "apt": "gawk",
+        "provides": ["awk"],
+        "required_by": "tools/diff.sh (first-diff offset only; pass/fail needs just cmp)",
+        "missing_error": "awk: command not found"
+      },
+      {
+        "name": "bash",
+        "apt": "bash",
+        "provides": ["/usr/bin/bash"],
+        "required_by": "tools/diff.sh",
+        "missing_error": "bash: bad interpreter"
+      }
+    ],
+    "apt_bootstrap_command": "sudo apt-get update && sudo apt-get install -y gcc make libc6-dev coreutils diffutils gawk bash"
+  },
+  "common_link_flags": ["-lm"],
+  "common_compile_flags": ["-O2", "-Wall", "-Wextra", "-std=c11", "-Isrc"],
+  "modules": [
+    {
+      "module": "bezier",
+      "group": 1,
+      "path": "bezier",
+      "headers_system": ["math.h", "stdio.h"],
+      "headers_local": ["bezier.h"],
+      "libs": ["m"],
+      "compile_units": ["src/bezier.c", "test.c", "demo.c"],
+      "build_test": "make -C bezier test",
+      "build_demo": "make -C bezier demo",
+      "artifacts": ["build/test", "build/demo"],
+      "missing_libm_error": null,
+      "step_count": 2
+    },
+    {
+      "module": "stroke",
+      "group": 1,
+      "path": "stroke",
+      "headers_system": ["math.h", "stdio.h"],
+      "headers_local": ["stroke.h"],
+      "libs": ["m"],
+      "compile_units": ["src/stroke.c", "test.c", "demo.c"],
+      "build_test": "make -C stroke test",
+      "build_demo": "make -C stroke demo",
+      "artifacts": ["build/test", "build/demo"],
+      "missing_libm_error": null,
+      "step_count": 2
+    },
+    {
+      "module": "dash",
+      "group": 1,
+      "path": "dash",
+      "headers_system": ["math.h", "stdio.h"],
+      "headers_local": ["dash.h"],
+      "libs": ["m"],
+      "compile_units": ["src/dash.c", "test.c", "demo.c"],
+      "build_test": "make -C dash test",
+      "build_demo": "make -C dash demo",
+      "artifacts": ["build/test", "build/demo"],
+      "missing_libm_error": "dash.c:(.text+...): undefined reference to `fmod'; ld returned 1 exit status",
+      "step_count": 2
+    },
+    {
+      "module": "bbox",
+      "group": 1,
+      "path": "bbox",
+      "headers_system": ["stdio.h"],
+      "headers_local": ["bbox.h"],
+      "libs": ["m"],
+      "compile_units": ["src/bbox.c", "test.c", "demo.c"],
+      "build_test": "make -C bbox test",
+      "build_demo": "make -C bbox demo",
+      "artifacts": ["build/test", "build/demo"],
+      "missing_libm_error": null,
+      "step_count": 2
+    },
+    {
+      "module": "hull",
+      "group": 2,
+      "path": "hull",
+      "headers_system": ["math.h", "stdio.h", "stdlib.h"],
+      "headers_local": ["hull.h"],
+      "libs": ["m"],
+      "compile_units": ["src/hull.c", "test.c", "demo.c"],
+      "build_test": "make -C hull test",
+      "build_demo": "make -C hull demo",
+      "artifacts": ["build/test", "build/demo"],
+      "missing_libm_error": null,
+      "step_count": 2
+    },
+    {
+      "module": "arclen",
+      "group": 2,
+      "path": "arclen",
+      "headers_system": ["math.h", "stdio.h"],
+      "headers_local": ["arclen.h"],
+      "libs": ["m"],
+      "compile_units": ["src/arclen.c", "test.c", "demo.c"],
+      "build_test": "make -C arclen test",
+      "build_demo": "make -C arclen demo",
+      "artifacts": ["build/test", "build/demo"],
+      "missing_libm_error": null,
+      "step_count": 2
+    },
+    {
+      "module": "isect",
+      "group": 3,
+      "path": "isect",
+      "headers_system": ["math.h", "stdio.h"],
+      "headers_local": ["isect.h"],
+      "libs": ["m"],
+      "compile_units": ["src/isect.c", "test.c", "demo.c"],
+      "build_test": "make -C isect test",
+      "build_demo": "make -C isect demo",
+      "artifacts": ["build/test", "build/demo"],
+      "missing_libm_error": null,
+      "step_count": 2
+    },
+    {
+      "module": "clip",
+      "group": 3,
+      "path": "clip",
+      "headers_system": ["math.h", "stdio.h"],
+      "headers_local": ["clip.h"],
+      "libs": ["m"],
+      "compile_units": ["src/clip.c", "test.c", "demo.c"],
+      "build_test": "make -C clip test",
+      "build_demo": "make -C clip demo",
+      "artifacts": ["build/test", "build/demo"],
+      "missing_libm_error": null,
+      "step_count": 2
+    },
+    {
+      "module": "svg",
+      "group": 4,
+      "path": "svg",
+      "headers_system": ["ctype.h", "stdio.h", "stdlib.h", "string.h"],
+      "headers_local": ["svgpath.h"],
+      "libs": ["m"],
+      "compile_units": ["src/svgpath.c", "test.c", "demo.c"],
+      "build_test": "make -C svg test",
+      "build_demo": "make -C svg demo",
+      "artifacts": ["build/test", "build/demo", "demo.pgm"],
+      "missing_libm_error": null,
+      "step_count": 2
+    },
+    {
+      "module": "xform",
+      "group": 4,
+      "path": "xform",
+      "headers_system": ["stdio.h"],
+      "headers_local": ["xform.h"],
+      "libs": ["m"],
+      "compile_units": ["src/xform.c", "test.c", "demo.c"],
+      "build_test": "make -C xform test",
+      "build_demo": "make -C xform demo",
+      "artifacts": ["build/test", "build/demo"],
+      "missing_libm_error": null,
+      "step_count": 2
+    },
+    {
+      "module": "render",
+      "group": 5,
+      "path": "render",
+      "headers_system": ["math.h", "stdio.h", "stdlib.h", "string.h"],
+      "headers_local": ["scene.h", "raster.h", "pipeline.h", "export.h"],
+      "libs": ["m"],
+      "compile_units": ["src/scene.c", "src/raster.c", "src/pipeline.c", "src/export.c", "test.c", "cli.c"],
+      "build_test": "make -C render test",
+      "build_demo": "make -C render build/cli",
+      "artifacts": ["build/test", "build/cli"],
+      "missing_libm_error": "pipeline.c:(.text+...): undefined reference to `sincos'; ld returned 1 exit status",
+      "step_count": 2
+    },
+    {
+      "module": "gold",
+      "group": 5,
+      "path": "gold",
+      "headers_system": ["math.h", "stdio.h", "stdlib.h", "string.h"],
+      "headers_local": [],
+      "libs": ["m"],
+      "compile_units": ["ref.c"],
+      "build_test": "make -C gold",
+      "build_demo": null,
+      "build_only": true,
+      "artifacts": ["build/ref"],
+      "missing_libm_error": null,
+      "step_count": 1
+    }
+  ],
+  "groups": [
+    {"group": 1, "name": "initial four modules", "modules": ["bezier", "stroke", "dash", "bbox"]},
+    {"group": 2, "name": "convex hull + arc length", "modules": ["hull", "arclen"]},
+    {"group": 3, "name": "segment intersection + convex clipping", "modules": ["isect", "clip"]},
+    {"group": 4, "name": "svg path parser + affine transform", "modules": ["svg", "xform"]},
+    {"group": 5, "name": "gold reference + diff tool + render pipeline", "modules": ["gold", "render"]}
+  ],
+  "render_verification": {
+    "scene_input": "fixtures/scene.txt",
+    "gold_input": "fixtures/poly.txt",
+    "baseline_image": "fixtures/baseline.pgm",
+    "image_format": "PGM P5, 40x40, maxval 255, 8x8 supersampled coverage grayscale",
+    "width": 40,
+    "height": 40,
+    "scale": 1.0,
+    "render_command": "render/build/cli fixtures/scene.txt <out.pgm> 40 40 1.0",
+    "gold_command": "gold/build/ref pixels fixtures/poly.txt 40 40 > <gold.pgm>",
+    "compare_command": "tools/diff.sh <out.pgm> fixtures/baseline.pgm",
+    "expected_result": "IDENTICAL, differing_pixels=0",
+    "supersample": 8,
+    "coverage_formula": "buf[i] = (unsigned char)(255 * hit / (ss * ss))"
+  },
+  "shortest_path_steps": [
+    {"step": 1, "action": "sudo apt-get update && sudo apt-get install -y gcc make libc6-dev coreutils diffutils gawk bash"},
+    {"step": 2, "action": "git clone <repo> && cd vector-lab"},
+    {"step": 3, "action": "make -C gold && make -C render build/cli"},
+    {"step": 4, "action": "render/build/cli fixtures/scene.txt /tmp/out.pgm 40 40 1.0"},
+    {"step": 5, "action": "tools/diff.sh /tmp/out.pgm fixtures/baseline.pgm  # expect IDENTICAL, 0 differing pixels"}
+  ]
+}

@@ -21,5 +21,6 @@ int pipeline_render(const RScene *s, RPlace place, RBox win, int w, int h, unsig
         for (int i = 0; i < tmp.n; ++i) tmp.pts[i] = move(tmp.pts[i], place);
         if (scene_add_poly(&moved, tmp.pts, tmp.n) != 0) return -4;
     }
-    return raster_fill(&moved, &win, w, h, 4, buf);
+    /* 8x8 超采样，与 gold/ref pixels 的 SS=8 对齐 */
+    return raster_fill(&moved, &win, w, h, 8, buf);
 }

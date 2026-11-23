@@ -25,9 +25,10 @@ int raster_fill(const RScene *s, const RBox *box, int w, int h, int ss, unsigned
                     double px = box->minx + (x + (i + 0.5) / ss) * dx;
                     double py = box->miny + (y + (j + 0.5) / ss) * dy;
                     for (int k = 0; k < s->npolys; ++k)
-                        if (inside(&s->polys[k], px, py)) { hit = 1; break; }
+                        if (inside(&s->polys[k], px, py)) { ++hit; break; }
                 }
-            buf[y * w + x] = hit ? 255 : 0;
+            /* 覆盖率灰度，与 gold/ref 的 255*c/(ss*ss) 公式一致，保证逐字节相同 */
+            buf[y * w + x] = (unsigned char)(255 * hit / (ss * ss));
         }
     return 0;
 }
