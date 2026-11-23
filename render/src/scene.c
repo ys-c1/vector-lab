@@ -1,4 +1,5 @@
 #include "scene.h"
+#include <stdio.h>
 
 void scene_init(RScene *s) { if (s) s->npolys = 0; }
 
@@ -32,4 +33,26 @@ int scene_count_verts(const RScene *s) {
     int n = 0;
     for (int k = 0; k < s->npolys; ++k) n += s->polys[k].n;
     return n;
+}
+
+int scene_load_txt(const char *path, RScene *s) {
+    if (!path || !s) return -2;
+    FILE *f = fopen(path, "r");
+    if (!f) return -1;
+    scene_init(s);
+    char tag[16];
+    while (fscanf(f, "%15s", tag) == 1) {
+        if (tag[0] != 'p') { fclose(f); return -2; }
+        RPoint pts[64];
+        int n = 0;
+        while (n < 64 && fscanf(f, "%lf %lf", &pts[n].x, &pts[n].y) == 2) {
+            ++n;
+            int c = fgetc(f);
+            if (c == '\n' || c == EOF) break;
+            ungetc(c, f);
+        }
+        if (scene_add_poly(s, pts, n) != 0) { fclose(f); return -2; }
+    }
+    fclose(f);
+    return s->npolys;
 }
