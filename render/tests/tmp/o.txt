@@ -1,0 +1,1 @@
+render /home/ys/feedback/uidreczz28cwSQP9Ywz/render/tests/scenes/ok.scene 16x16 ss=8 polys=1 verts=4 on=256 blocked=no

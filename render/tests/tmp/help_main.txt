@@ -1,0 +1,8 @@
+usage: rvec <subcommand> <scene> [options]
+子命令：
+  parse     解析并校验场景文件，打印结构摘要
+  diagnose  对场景文件跑完整诊断，逐条报告必填段与字段
+  render    渲染到内存并报告统计，不写文件
+  export    渲染并导出 PGM 文件
+通用：rvec <subcommand> --help 查看该子命令参数表
+旧位置参数：RVEC_LEGACY=1 rvec scene.txt out.pgm w h scale

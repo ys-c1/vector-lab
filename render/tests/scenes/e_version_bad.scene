@@ -1,0 +1,7 @@
+version 2
+canvas 16 16 1.0
+poly
+0 0
+1 0
+1 1
+end

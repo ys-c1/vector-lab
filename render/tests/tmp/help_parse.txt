@@ -1,0 +1,4 @@
+usage: rvec parse <scene>
+解析并校验场景文件，打印结构摘要
+参数表：
+  scene     path 必填          场景文件路径（位置参数，必填）

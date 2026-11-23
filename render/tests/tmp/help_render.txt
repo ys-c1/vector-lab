@@ -1,0 +1,5 @@
+usage: rvec render <scene> [--ss <int>]
+渲染到内存并报告统计，不写文件
+参数表：
+  scene     path 必填          场景文件路径（位置参数，必填）
+  --ss      int  可选 [1..8]  超采样阶数（1..8，默认 4）

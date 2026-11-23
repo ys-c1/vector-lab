@@ -1,0 +1,7 @@
+usage: rvec export <scene> --out <path> [--ss <int>] [--force]
+渲染并导出 PGM 文件
+参数表：
+  scene     path 必填          场景文件路径（位置参数，必填）
+  --out     path 必填          输出 PGM 路径（必填）
+  --ss      int  可选 [1..8]  超采样阶数（1..8，默认 4）
+  --force   flag 可选          允许覆盖已存在的输出文件

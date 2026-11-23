@@ -10,10 +10,11 @@ static RPoint move(RPoint p, RPlace q) {
     return r;
 }
 
-int pipeline_render(const RScene *s, RPlace place, RBox win, int w, int h, unsigned char *buf) {
+int pipeline_render_ss(const RScene *s, RPlace place, RBox win, int w, int h, int ss, unsigned char *buf) {
     if (!s || !buf || w <= 0 || h <= 0) return -1;
     if (place.scale == 0.0) return -2;
     if (!(win.maxx > win.minx) || !(win.maxy > win.miny)) return -3;
+    if (ss < 1 || ss > 8) return -5;
     RScene moved;
     scene_init(&moved);
     for (int k = 0; k < s->npolys; ++k) {
@@ -21,5 +22,9 @@ int pipeline_render(const RScene *s, RPlace place, RBox win, int w, int h, unsig
         for (int i = 0; i < tmp.n; ++i) tmp.pts[i] = move(tmp.pts[i], place);
         if (scene_add_poly(&moved, tmp.pts, tmp.n) != 0) return -4;
     }
-    return raster_fill(&moved, &win, w, h, 4, buf);
+    return raster_fill(&moved, &win, w, h, ss, buf);
+}
+
+int pipeline_render(const RScene *s, RPlace place, RBox win, int w, int h, unsigned char *buf) {
+    return pipeline_render_ss(s, place, win, w, h, 4, buf);
 }
