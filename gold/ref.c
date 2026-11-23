@@ -3,6 +3,7 @@
  *   ref area  <poly.txt>          输出面积，6 位小数
  *   ref pixels <poly.txt> <w> <h> 输出 PGM，8x8 超采样
  *   ref points <line.txt> <n>     输出 n 等分点（按累计弧长）
+ *   ref jitter <seed> <n>         输出确定性抖动序列（jitter1 头 + n 行 ux uy）
  * 输入格式：每行 "x y"，多边形首尾自动闭合。
  */
 #include <math.h>
@@ -115,10 +116,34 @@ static int cmd_points(const char *path, int n) {
     return 0;
 }
 
+static unsigned long long ref_sm64(unsigned long long *st) {
+    *st += 0x9E3779B97F4A7C15ULL;
+    unsigned long long z = *st;
+    z = (z ^ (z >> 30)) * 0xBF58476D1CE4E5B9ULL;
+    z = (z ^ (z >> 27)) * 0x94D049BB133111EBULL;
+    return z ^ (z >> 31);
+}
+
+static int cmd_jitter(unsigned long long seed, int n) {
+    if (seed == 0 || n <= 0) {
+        fprintf(stderr, "rejected: seed must be nonzero and n positive\n");
+        return 2;
+    }
+    unsigned long long st = seed;
+    printf("jitter1 %llu %d\n", seed, n);
+    for (int t = 0; t < n; ++t) {
+        double ux = (double)(ref_sm64(&st) >> 11) * (1.0 / 9007199254740992.0);
+        double uy = (double)(ref_sm64(&st) >> 11) * (1.0 / 9007199254740992.0);
+        printf("%.17g %.17g\n", ux, uy);
+    }
+    return 0;
+}
+
 int main(int argc, char **argv) {
     if (argc < 3) return 1;
     if (!strcmp(argv[1], "area")) return cmd_area(argv[2]);
     if (!strcmp(argv[1], "pixels") && argc >= 5) return cmd_pixels(argv[2], atoi(argv[3]), atoi(argv[4]));
     if (!strcmp(argv[1], "points") && argc >= 4) return cmd_points(argv[2], atoi(argv[3]));
+    if (!strcmp(argv[1], "jitter") && argc >= 4) return cmd_jitter(strtoull(argv[2], NULL, 10), atoi(argv[3]));
     return 1;
 }
