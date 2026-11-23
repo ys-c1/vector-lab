@@ -1,3 +1,5 @@
 build/
 *.o
 demo.txt
+repro/out/
+repro/build/
