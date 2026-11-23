@@ -1,8 +1,8 @@
 CC ?= gcc
 CFLAGS ?= -O2 -Wall -Wextra -std=c11
 CPPFLAGS ?= -Isrc
-SRC := $(wildcard src/*.c)
-HDR := $(wildcard src/*.h)
+SRC := $(sort $(wildcard src/*.c))
+HDR := $(sort $(wildcard src/*.h))
 
 all: test
 

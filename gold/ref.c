@@ -5,6 +5,7 @@
  *   ref points <line.txt> <n>     输出 n 等分点（按累计弧长）
  * 输入格式：每行 "x y"，多边形首尾自动闭合。
  */
+#include <locale.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -116,6 +117,7 @@ static int cmd_points(const char *path, int n) {
 }
 
 int main(int argc, char **argv) {
+    setlocale(LC_ALL, "C");
     if (argc < 3) return 1;
     if (!strcmp(argv[1], "area")) return cmd_area(argv[2]);
     if (!strcmp(argv[1], "pixels") && argc >= 5) return cmd_pixels(argv[2], atoi(argv[3]), atoi(argv[4]));

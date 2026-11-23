@@ -1,6 +1,8 @@
 #include "arclen.h"
+#include <locale.h>
 #include <stdio.h>
 int main(void) {
+    setlocale(LC_ALL, "C");
     APoint p[4] = {{0,0},{30,0},{30,20},{0,20}};
     ATable t;
     if (arclen_build(p, 4, &t) != 0) return 1;

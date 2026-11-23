@@ -1,6 +1,8 @@
 #include "bezier.h"
+#include <locale.h>
 #include <stdio.h>
 int main(void) {
+    setlocale(LC_ALL, "C");
     BPoint c[4] = {{0,0},{20,40},{60,40},{80,0}};
     BPoly p;
     if (bezier_flatten(c, 0.5, &p) != 0) return 1;

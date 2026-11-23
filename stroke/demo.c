@@ -1,6 +1,8 @@
 #include "stroke.h"
+#include <locale.h>
 #include <stdio.h>
 int main(void) {
+    setlocale(LC_ALL, "C");
     SPoint p[4] = {{0,0},{30,0},{30,20},{0,20}};
     SPoly out;
     if (stroke_polyline(p, 4, 3.0, &out) != 0) return 1;

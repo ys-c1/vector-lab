@@ -1,0 +1,2 @@
+# name scene w h scale
+scene scene.txt 160 120 1.25

@@ -1,11 +1,17 @@
 #include "svgpath.h"
-#include <ctype.h>
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+/* 只认 ASCII 空白：isspace 的分类表来自 LC_CTYPE，换语言环境就可能把
+ * 不同字节判成空白，解析结果随之变化。 */
+static int ascii_space(unsigned char c) {
+    return c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' || c == '\v';
+}
+
 static const char *skip_sep(const char *p) {
-    while (*p && (isspace((unsigned char)*p) || *p == ',')) ++p;
+    while (*p && (ascii_space((unsigned char)*p) || *p == ',')) ++p;
     return p;
 }
 
@@ -19,6 +25,9 @@ static const char *read_num(const char *p, double *v) {
 
 int svg_parse(const char *d, VPath *out) {
     if (!d || !out) return -1;
+    /* strtod 的行为受 LC_NUMERIC 影响：锁 "C" 才能让 "." 永远是小数点，
+     * 不随调用方进程的 locale 变化（库里不应假定 main 已经设过）。 */
+    setlocale(LC_NUMERIC, "C");
     out->count = 0;
     const char *p = skip_sep(d);
     if (!p || (*p != 'M' && *p != 'm')) return -2;

@@ -1,7 +1,9 @@
 #include "svgpath.h"
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 int main(void) {
+    setlocale(LC_ALL, "C");
     VPath p;
     if (svg_parse("M5,5 L45,5 L45,45 L5,45 Z M15,15 L35,15 L35,35 L15,35 Z", &p) != 0) return 1;
     int w = 50, h = 50;

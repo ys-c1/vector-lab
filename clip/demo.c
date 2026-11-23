@@ -1,6 +1,8 @@
 #include "clip.h"
+#include <locale.h>
 #include <stdio.h>
 int main(void) {
+    setlocale(LC_ALL, "C");
     CPoint poly[4] = {{0,0},{20,0},{20,10},{0,10}};
     CPoint win[4] = {{5,-5},{15,-5},{15,5},{5,5}};
     CPoly out;

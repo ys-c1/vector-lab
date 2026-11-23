@@ -1,6 +1,8 @@
 #include "bbox.h"
+#include <locale.h>
 #include <stdio.h>
 int main(void) {
+    setlocale(LC_ALL, "C");
     GPoint p[5] = {{0,0},{10,4},{4,10},{-2,3},{6,-1}};
     GBox b;
     if (bbox_of_points(p, 5, &b) != 0) return 1;
